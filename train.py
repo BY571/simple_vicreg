@@ -57,7 +57,7 @@ def get_arguments():
     # Running
     parser.add_argument('--device', default='cuda',
                         help='device to use for training / testing')
-
+    args = parser.parse_args()
     return parser
 
 
@@ -167,6 +167,5 @@ def off_diagonal(x):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser('VICReg training script', parents=[get_arguments()])
-    args = parser.parse_args()
+    args = get_arguments()
     main(args)
