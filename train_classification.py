@@ -23,7 +23,7 @@ def get_arguments():
     parser.add_argument("--run_name", type=str, default="VICReg-classification")
 
     # Checkpoints saving
-    parser.add_argument("--checkpoint", type=str, default="models/resnet_1.pth")
+    parser.add_argument("--checkpoint", type=str, default="models/resnet_49.pth")
     parser.add_argument("--save-every", type=int, default=5, help="")
 
     # Model
@@ -70,16 +70,16 @@ def main(args):
     transforms = aug.TestTransform()
 
     train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transforms)
-    test_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transforms)
+    test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transforms)
     
     print("Train Set length: ", len(train_dataset))
-    print("Train Set length: ", len(test_dataset))
+    print("Test Set length: ", len(test_dataset))
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size)
     
     with wandb.init(project="Simple-VICReg", name=args.run_name, config=args):
         backbone, embedding = simple_resnet()
-        state_dict = torch.load(args.pretrained, map_location="cpu")
+        state_dict = torch.load(args.checkpoint, map_location="cpu")
         missing_keys, unexpected_keys = backbone.load_state_dict(state_dict, strict=False)
         assert missing_keys == [] and unexpected_keys == []
 
