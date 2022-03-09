@@ -24,6 +24,7 @@ def get_arguments():
 
     # Checkpoints saving
     parser.add_argument("--checkpoint", type=str, default="models/resnet_1.pth")
+    parser.add_argument("--weights", type=str, default="no-freeze", choices=["freeze", "no-freeze"])
     parser.add_argument("--save-every", type=int, default=5, help="")
 
     # Model
@@ -79,7 +80,7 @@ def main(args):
     
     with wandb.init(project="Simple-VICReg", name=args.run_name, config=args):
         backbone, embedding = simple_resnet()
-        state_dict = torch.load(args.pretrained, map_location="cpu")
+        state_dict = torch.load(args.checkpoint, map_location="cpu")
         missing_keys, unexpected_keys = backbone.load_state_dict(state_dict, strict=False)
         assert missing_keys == [] and unexpected_keys == []
 
