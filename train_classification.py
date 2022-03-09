@@ -1,20 +1,15 @@
-# TODO: 
-# add training script with a pretrained // not pretrained VICReg
-from doctest import testfile
-from pathlib import Path
+
 import argparse
 import os
-import sys
 import numpy as np
 
 import wandb
 import torch
-import torch.nn.functional as F
 from torch import nn, optim
 import torchvision.datasets as datasets
 
 import augmentations as aug
-
+from utils import AverageMeter, accuracy
 from resnet import simple_resnet, resnet50, resnet34
 
 
@@ -81,6 +76,7 @@ def main(args):
     
     with wandb.init(project="Simple-VICReg", name=args.run_name, config=args):
         backbone, embedding = simple_resnet()
+        
         state_dict = torch.load(args.checkpoint, map_location="cpu")
         missing_keys, unexpected_keys = backbone.load_state_dict(state_dict, strict=False)
         assert missing_keys == [] and unexpected_keys == []
@@ -101,6 +97,8 @@ def main(args):
         criterion = nn.CrossEntropyLoss().cuda(gpu)
         optimizer = optim.SGD(model.parameters(), lr=args.learning_rate)    
         start_epoch = 1
+        best_acc = {"top1": 0.0,
+                    "top5": 0.0}
 
         for epoch in range(start_epoch, args.epochs):
             # Train 
@@ -117,6 +115,8 @@ def main(args):
 
             # Evaluation
             model.eval()
+            top1 = AverageMeter("Acc@1")
+            top5 = AverageMeter("Acc@5")
             with torch.no_grad():
                 overall_test_loss = []
                 for step, (images, target) in enumerate(test_loader, start=epoch * len(test_loader)):
@@ -124,13 +124,21 @@ def main(args):
                     images = images.cuda(gpu, non_blocking=True)
                     prediction = model.forward(images)
                     loss = criterion(prediction, target.cuda(gpu, non_blocking=True))
+                    acc1, acc5 = accuracy(
+                        prediction, target.cuda(gpu, non_blocking=True), topk=(1, 5)
+                    )
+                    top1.update(acc1[0].item(), images.size(0))
+                    top5.update(acc5[0].item(), images.size(0))
                     overall_test_loss.append(loss.item())
-                    # these include the weights!
 
+                best_acc["top1"] = max(best_acc["top1"], top1.avg)
+                best_acc["top5"] = max(best_acc["top5"], top5.avg)
                 print("Epoch: {} -- Train Loss: {:.4f} -- Test Loss: {:.4f}".format(epoch,  np.mean(overall_loss), np.mean(overall_test_loss)))
                 wandb.log({"Epoch": epoch,
                            "Train loss": np.mean(overall_loss),
-                           "Test loss": np.mean(overall_test_loss)})
+                           "Test loss": np.mean(overall_test_loss),
+                           "Top1 acc": best_acc["top1"],
+                           "Top5 acc": best_acc["top5"]})
                 model.train()
 
 
