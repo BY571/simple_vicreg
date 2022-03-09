@@ -90,9 +90,9 @@ def main(args):
         model = nn.Sequential(backbone, head)
         model.cuda(gpu)
 
-    if args.weights == "freeze":
-        backbone.requires_grad_(False)
-        head.requires_grad_(True)
+        if args.weights == "freeze":
+            backbone.requires_grad_(False)
+            head.requires_grad_(True)
 
         wandb.watch(model)
         print(model)
