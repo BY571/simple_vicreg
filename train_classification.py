@@ -78,6 +78,7 @@ def main(args):
     with wandb.init(project="Simple-VICReg", name=args.run_name, config=args):
         backbone, embedding = simple_resnet()
         if args.load_pretrained:
+            print("... Load pretrained weights ...")
             state_dict = torch.load(args.checkpoint, map_location="cpu")
             missing_keys, unexpected_keys = backbone.load_state_dict(state_dict, strict=False)
             assert missing_keys == [] and unexpected_keys == []
@@ -89,6 +90,7 @@ def main(args):
         model.cuda(gpu)
 
         if args.weights == "freeze":
+            print("Freeze backone!")
             backbone.requires_grad_(False)
             head.requires_grad_(True)
 
