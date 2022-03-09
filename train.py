@@ -100,7 +100,8 @@ def main(args):
                        "Std loss": np.mean(std_losses),
                        "Covariance loss": np.mean(cov_losses)})
             if epoch % args.save_every == 0:
-                torch.save(model.module.backbone.state_dict(), "models/resnet50_{}.pth".format(epoch))
+                torch.save(model.backbone.state_dict(), "models/resnet_{}.pth".format(epoch))
+                wandb.save("models/resnet50_{}.pth".format(epoch))
 
 
 class VICReg(nn.Module):

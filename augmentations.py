@@ -90,3 +90,25 @@ class TrainTransform(object):
         x1 = self.transform(sample)
         x2 = self.transform_prime(sample)
         return x1, x2
+    
+class TestTransform(object):
+    def __init__(self):
+        self.transform = transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Normalize((0.1307,), (0.3081,)
+                ),
+            ]
+        )
+        # self.transform_prime = transforms.Compose(
+        #     [
+        #         transforms.ToTensor(),
+        #         transforms.Normalize((0.1307,), (0.3081,)
+        #         ),
+        #     ]
+        # )
+
+    def __call__(self, sample):
+        # does different guassian blur and solarization transformation of the input images 
+        x1 = self.transform(sample)
+        return x1
