@@ -66,7 +66,7 @@ def main(args):
 
     transforms = aug.TrainTransform()
 
-    dataset = datasets.Caltech101(root='./data', train=True, download=True, transform=transforms)
+    dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transforms)
     print("Train Set length: ", len(dataset))
     loader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size)
     
