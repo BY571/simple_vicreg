@@ -71,10 +71,10 @@ def main(args):
     transforms = aug.TestTransform()
 
     train_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transforms)
-    test_dataset = datasets.MNIST(root='./data', train=True, download=True, transform=transforms)
+    test_dataset = datasets.MNIST(root='./data', train=False, download=True, transform=transforms)
     
     print("Train Set length: ", len(train_dataset))
-    print("Train Set length: ", len(test_dataset))
+    print("Test Set length: ", len(test_dataset))
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=args.batch_size)
     test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=args.batch_size)
     
