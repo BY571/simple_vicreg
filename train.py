@@ -12,7 +12,7 @@ import torchvision.datasets as datasets
 
 import augmentations as aug
 
-from resnet import resnet50
+from resnet import resnet50, resnet34
 
 
 def get_arguments():
@@ -26,13 +26,13 @@ def get_arguments():
     # Model
     # parser.add_argument("--arch", type=str, default="resnet50",
     #                     help='Architecture of the backbone encoder network')
-    parser.add_argument("--mlp", default="8192-8192-8192",
+    parser.add_argument("--mlp", "2048-2048-2048", # for ImageNetdefault="8192-8192-8192",
                         help='Size and number of layers of the MLP expander head')
 
     # Optim
-    parser.add_argument("--epochs", type=int, default=100,
+    parser.add_argument("--epochs", type=int, default=50,
                         help='Number of epochs')
-    parser.add_argument("--batch-size", type=int, default=2048,
+    parser.add_argument("--batch-size", type=int, default=512,
                         help='Effective batch size (per worker batch size is [batch-size] / world-size)')
     parser.add_argument("--learning_rate", type=float, default=1e-3, help="Default learning rate when using a standard optimizer")
     parser.add_argument("--base-lr", type=float, default=0.2,
@@ -109,7 +109,7 @@ class VICReg(nn.Module):
         self.args = args
         self.num_features = int(args.mlp.split("-")[-1])
         # only loading one resnet encoder! Remember this could be two different networks, with different architecture!
-        self.backbone, self.embedding = resnet50(zero_init_residual=True)
+        self.backbone, self.embedding = resnet34(zero_init_residual=True)
 
         # expander layers
         # could be also two expanders

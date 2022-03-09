@@ -39,7 +39,7 @@ class TrainTransform(object):
         self.transform = transforms.Compose(
             [
                 transforms.RandomResizedCrop(
-                    224, interpolation=InterpolationMode.BICUBIC   # 224 for imagenet | 32x32 for cifra
+                    28, interpolation=InterpolationMode.BICUBIC   # 224 for imagenet | 32x32 for cifra
                 ),
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.RandomApply(
@@ -54,15 +54,16 @@ class TrainTransform(object):
                 GaussianBlur(p=1.0),
                 Solarization(p=0.0),
                 transforms.ToTensor(),
-                transforms.Normalize(
-                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                transforms.Normalize((0.1307,), (0.3081,)
+                #transforms.Normalize(
+                #    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
                 ),
             ]
         )
         self.transform_prime = transforms.Compose(
             [
                 transforms.RandomResizedCrop(
-                    224, interpolation=InterpolationMode.BICUBIC
+                    28, interpolation=InterpolationMode.BICUBIC
                 ),
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.RandomApply(
@@ -77,8 +78,9 @@ class TrainTransform(object):
                 GaussianBlur(p=0.1),
                 Solarization(p=0.2),
                 transforms.ToTensor(),
-                transforms.Normalize(
-                    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+                transforms.Normalize((0.1307,), (0.3081,)
+                #transforms.Normalize(
+                #    mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
                 ),
             ]
         )
