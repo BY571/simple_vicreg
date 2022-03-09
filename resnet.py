@@ -315,3 +315,56 @@ def resnet50(**kwargs):
 
 # def resnet200x2(**kwargs):
 #     return ResNet(Bottleneck, [3, 24, 36, 3], widen=2, **kwargs), 4096
+
+
+def simple_resnet(**kwargs):
+    return SimpleResnet(), 64
+
+
+class ResBlock(nn.Module):
+    def __init__(self, nf):
+        super().__init__()
+
+        self.conv1 = nn.Conv2d(nf, nf, kernel_size=3, stride=1, padding=1, bias=False) 
+        self.bn1 = nn.BatchNorm2d(nf)    
+        self.relu = nn.ReLU(inplace=True)
+        self.conv2 = nn.Conv2d(nf, nf, kernel_size=3, stride=1, padding=1, bias=False)
+        self.bn2 = nn.BatchNorm2d(nf)    
+
+    def forward(self, x):
+        o = self.conv1(x)
+        o = self.bn1(o)
+        o = self.relu(o)
+        o = self.conv2(o)
+        o = self.bn2(o)
+        o = o + x
+        o = self.relu(o)
+        return o 
+
+# kernel of 3x3, stride of 2 and padding 1
+def convk3s2p1(ni, nf):
+    return nn.Sequential(
+        nn.Conv2d(ni, nf, 3,2,1, bias=False),
+        nn.BatchNorm2d(nf),
+        nn.ReLU()
+    )
+
+class SimpleResnet(nn.Module):
+    def __init__(self, ):
+        super(SimpleResnet, self).__init__()
+
+        self.model = nn.Sequential(convk3s2p1(1, 8),
+                              ResBlock(8),
+                              convk3s2p1(8, 16),
+                              ResBlock(16),
+                              convk3s2p1(16, 32),
+                              ResBlock(32),
+                              convk3s2p1(32, 16),
+                              #nn.AdaptiveAvgPool2d((1, 1)),
+                              nn.Flatten())
+    def forward(self, x):
+        return self.model(x)
+                  
+
+
+

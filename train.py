@@ -12,7 +12,7 @@ import torchvision.datasets as datasets
 
 import augmentations as aug
 
-from resnet import resnet50, resnet34
+from resnet import simple_resnet, resnet50, resnet34
 
 
 def get_arguments():
@@ -26,7 +26,7 @@ def get_arguments():
     # Model
     # parser.add_argument("--arch", type=str, default="resnet50",
     #                     help='Architecture of the backbone encoder network')
-    parser.add_argument("--mlp", "2048-2048-2048", # for ImageNetdefault="8192-8192-8192",
+    parser.add_argument("--mlp", default="2048-2048-2048", # for ImageNetdefault="8192-8192-8192",
                         help='Size and number of layers of the MLP expander head')
 
     # Optim
@@ -109,7 +109,7 @@ class VICReg(nn.Module):
         self.args = args
         self.num_features = int(args.mlp.split("-")[-1])
         # only loading one resnet encoder! Remember this could be two different networks, with different architecture!
-        self.backbone, self.embedding = resnet34(zero_init_residual=True)
+        self.backbone, self.embedding = simple_resnet()
 
         # expander layers
         # could be also two expanders
