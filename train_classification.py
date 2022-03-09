@@ -20,6 +20,7 @@ def get_arguments():
 
     # Checkpoints saving
     parser.add_argument("--checkpoint", type=str, default="models/resnet_1.pth")
+    parser.add_argument("--load_pretrained", type=int, default=0)
     parser.add_argument("--weights", type=str, default="no-freeze", choices=["freeze", "no-freeze"])
     parser.add_argument("--save-every", type=int, default=5, help="")
 
@@ -76,12 +77,12 @@ def main(args):
     
     with wandb.init(project="Simple-VICReg", name=args.run_name, config=args):
         backbone, embedding = simple_resnet()
-        
-        state_dict = torch.load(args.checkpoint, map_location="cpu")
-        missing_keys, unexpected_keys = backbone.load_state_dict(state_dict, strict=False)
-        assert missing_keys == [] and unexpected_keys == []
+        if args.load_pretrained:
+            state_dict = torch.load(args.checkpoint, map_location="cpu")
+            missing_keys, unexpected_keys = backbone.load_state_dict(state_dict, strict=False)
+            assert missing_keys == [] and unexpected_keys == []
 
-        head = nn.Linear(embedding, 1000)
+        head = nn.Linear(embedding, 10)
         head.weight.data.normal_(mean=0.0, std=0.01)
         head.bias.data.zero_()
         model = nn.Sequential(backbone, head)
