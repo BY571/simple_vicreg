@@ -52,7 +52,7 @@ def get_arguments():
     parser.add_argument('--device', default='cuda',
                         help='device to use for training / testing')
     args = parser.parse_args()
-    return parser
+    return args
 
 
 def main(args):
@@ -66,8 +66,8 @@ def main(args):
 
     transforms = aug.TrainTransform()
 
-    dataset = datasets.ImageNet(root='./data', train=True, download=True, transform=transforms)
-
+    dataset = datasets.Caltech101(root='./data', train=True, download=True, transform=transforms)
+    print("Train Set length: ", len(dataset))
     loader = torch.utils.data.DataLoader(dataset, batch_size=args.batch_size)
     
     with wandb.init(project="Simple-VICReg", name=args.run_name, config=args):

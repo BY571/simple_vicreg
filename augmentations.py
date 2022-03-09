@@ -39,7 +39,7 @@ class TrainTransform(object):
         self.transform = transforms.Compose(
             [
                 transforms.RandomResizedCrop(
-                    224, interpolation=InterpolationMode.BICUBIC
+                    224, interpolation=InterpolationMode.BICUBIC   # 224 for imagenet | 32x32 for cifra
                 ),
                 transforms.RandomHorizontalFlip(p=0.5),
                 transforms.RandomApply(
