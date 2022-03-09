@@ -18,16 +18,10 @@ from resnet import resnet50
 def get_arguments():
     parser = argparse.ArgumentParser(description="Pretrain a resnet model with VICReg", add_help=False)
 
-    # Data
     parser.add_argument("--run_name", type=str, default="VICReg-Image")
-    parser.add_argument("")
-    parser.add_argument("--data-dir", type=Path, default="/path/to/imagenet", required=True,
-                        help='Path to the image net dataset')
 
-    # Checkpoints
-    parser.add_argument("--exp-dir", type=Path, default="./exp",
-                        help='Path to the experiment folder, where all logs/checkpoints will be stored')
-    parser.add_argument("--save-every", type=int, default=5, helpt="")
+    # Checkpoints saving
+    parser.add_argument("--save-every", type=int, default=5, help="")
 
     # Model
     # parser.add_argument("--arch", type=str, default="resnet50",
