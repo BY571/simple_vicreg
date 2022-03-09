@@ -1,5 +1,6 @@
 # TODO: 
 # add training script with a pretrained // not pretrained VICReg
+from doctest import testfile
 from pathlib import Path
 import argparse
 import os
@@ -102,6 +103,7 @@ def main(args):
         start_epoch = 1
 
         for epoch in range(start_epoch, args.epochs):
+            # Train 
             overall_loss = []
             for step, (images, target) in enumerate(train_loader, start=epoch * len(train_loader)):
 
@@ -112,12 +114,24 @@ def main(args):
                 loss.backward()
                 optimizer.step()
                 overall_loss.append(loss.item())
-                # these include the weights!
 
-            print("Epoch: {} -- Loss: {:.4f}".format(epoch, np.mean(overall_loss)))
-            wandb.log({"Epoch": epoch,
-                       "Train loss": np.mean(overall_loss)})
+            # Evaluation
+            model.eval()
+            with torch.no_grad():
+                overall_test_loss = []
+                for step, (images, target) in enumerate(test_loader, start=epoch * len(test_loader)):
 
+                    images = images.cuda(gpu, non_blocking=True)
+                    prediction = model.forward(images)
+                    loss = criterion(prediction, target.cuda(gpu, non_blocking=True))
+                    overall_test_loss.append(loss.item())
+                    # these include the weights!
+
+                print("Epoch: {} -- Train Loss: {:.4f} -- Test Loss: {:.4f}".format(epoch,  np.mean(overall_loss), np.mean(overall_test_loss)))
+                wandb.log({"Epoch": epoch,
+                           "Train loss": np.mean(overall_loss),
+                           "Test loss": np.mean(overall_test_loss)})
+                model.train()
 
 
 if __name__ == "__main__":
